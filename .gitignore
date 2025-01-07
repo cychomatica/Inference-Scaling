@@ -1,0 +1,11 @@
+# comparison/**/*
+# majority_voting_metrics/**/*
+# best_of_n_metrics/**/*
+strawberry1/transformed_llama1b_math500/**/*
+strawberry1/transformed_prm800k_small_test_set/**/*
+strawberry1/transformed_mmlupro/**/*
+strawberry1/full_precision_results/**/*
+generated_outputs/
+# weighted_best_of_n_metrics/**/*
+**/__pycache__/
+reset.sh
