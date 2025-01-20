@@ -20,16 +20,16 @@ import matplotlib.pyplot as plt
 import argparse
 
 
-def calculate_weighted_best_of_n_metrics(data, category, json_file_path):
+def calculate_weighted_majority_voting_metrics(data, category, json_file_path):
     """
-    Calculate Weighted Best-of-N metrics by aggregating RM rewards across identical responses.
+    Calculate Weighted Majority Voting metrics by aggregating RM rewards across identical responses.
     Save metrics and plots.
 
     Args:
         json_file_path (str): The path to the JSON file.
     
     Returns:
-        dict: A dictionary containing the metrics for Weighted Best-of-N.
+        dict: A dictionary containing the metrics for Weighted Majority Voting.
     """
     # Load the JSON file
     # with open(json_file_path, 'r', encoding='utf-8') as file:
@@ -39,10 +39,10 @@ def calculate_weighted_best_of_n_metrics(data, category, json_file_path):
     # script_path = os.path.abspath(__file__)
     # script_dir = os.path.dirname(script_path)
     results_dir = "results_by_category"
-    output_dir = os.path.join(results_dir, "weighted_best_of_n_metrics", os.path.basename(json_file_path).split(".js")[0], category)
+    output_dir = os.path.join(results_dir, "weighted_majority_voting_metrics", os.path.basename(json_file_path).split(".js")[0], category)
     os.makedirs(output_dir, exist_ok=True)
 
-    # Initialize variables for Weighted Best-of-N
+    # Initialize variables for Weighted Majority Voting
     max_samples = 256  # Maximum CoT solutions per problem
     # sample_powers = [2 ** i for i in range(9)]  # 2^0 to 2^8
     # sample_powers = [a for a in sample_powers if a < len(data[0]['chain_of_thoughts'])] + [len(data[0]['chain_of_thoughts'])]
@@ -51,7 +51,7 @@ def calculate_weighted_best_of_n_metrics(data, category, json_file_path):
     metrics = {method: {} for method in aggregation_methods}  # Store metrics for each method
 
     for method in aggregation_methods:
-        sampling_results = {n: [] for n in sample_powers}  # Store results for Weighted Best-of-N
+        sampling_results = {n: [] for n in sample_powers}  # Store results for Weighted Majority Voting
 
         for n in sample_powers:
             if n > max_samples:
@@ -146,7 +146,7 @@ def calculate_weighted_best_of_n_metrics(data, category, json_file_path):
         plt.xticks(x, labels=[f"{n}" for n in x])
         plt.xlabel("Number of sampled CoT solutions")
         plt.ylabel("Accuracy (%)")
-        plt.title(f"Weighted Best-of-N Accuracy ({method.capitalize()} RM Reward Aggregation)")
+        plt.title(f"Weighted Majority Voting Accuracy ({method.capitalize()} RM Reward Aggregation)")
         plt.legend()
         plt.grid(True)
 
@@ -400,15 +400,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def compare_results(file_basename, majority_voting_folder, best_of_n_folder, weighted_best_of_n_folder):
+def compare_results(file_basename, majority_voting_folder, best_of_n_folder, weighted_majority_voting_folder):
     """
-    Compare the results of Majority Voting, Best-of-N, and Weighted Best-of-N
+    Compare the results of Majority Voting, Best-of-N, and Weighted Majority Voting
     and plot them on the same graph for each RM reward aggregation method (last, mean, min).
     
     Args:
         majority_voting_folder (str): Folder name of Majority Voting results.
         best_of_n_folder (str): Folder name of Best-of-N results.
-        weighted_best_of_n_folder (str): Folder name of Weighted Best-of-N results.
+        weighted_majority_voting_folder (str): Folder name of Weighted Majority Voting results.
     """
     # Define the output directory
     # script_path = os.path.abspath(__file__)
@@ -423,7 +423,7 @@ def compare_results(file_basename, majority_voting_folder, best_of_n_folder, wei
     # Define file paths for each method
     majority_voting_path = os.path.join(results_dir, majority_voting_folder, file_basename)
     best_of_n_path = os.path.join(results_dir, best_of_n_folder, file_basename)
-    weighted_best_of_n_path = os.path.join(results_dir, weighted_best_of_n_folder, file_basename)
+    weighted_majority_voting_path = os.path.join(results_dir, weighted_majority_voting_folder, file_basename)
 
     for method in aggregation_methods:
         # Load metrics for Majority Voting
@@ -436,26 +436,27 @@ def compare_results(file_basename, majority_voting_folder, best_of_n_folder, wei
         with open(best_of_n_metrics_file, 'r', encoding='utf-8') as file:
             best_of_n_metrics = json.load(file)
 
-        # Load metrics for Weighted Best-of-N
-        weighted_best_of_n_metrics_file = os.path.join(weighted_best_of_n_path, f"metrics_{method}.json")
-        with open(weighted_best_of_n_metrics_file, 'r', encoding='utf-8') as file:
-            weighted_best_of_n_metrics = json.load(file)
+        # Load metrics for Weighted Majority Voting
+        weighted_majority_voting_metrics_file = os.path.join(weighted_majority_voting_path, f"metrics_{method}.json")
+        with open(weighted_majority_voting_metrics_file, 'r', encoding='utf-8') as file:
+            weighted_majority_voting_metrics = json.load(file)
 
         # Extract data for plotting
         x = list(map(int, best_of_n_metrics.keys()))  # Sampling sizes (2^0, 2^1, ..., 2^8)
         majority_y = [majority_metrics[str(n)]["mean"] * 100 for n in x]  # Convert to percentages
         best_of_n_y = [best_of_n_metrics[str(n)]["mean"] * 100 for n in x]
-        weighted_best_of_n_y = [weighted_best_of_n_metrics[str(n)]["mean"] * 100 for n in x]
+        weighted_majority_voting_y = [weighted_majority_voting_metrics[str(n)]["mean"] * 100 for n in x]
 
         # Plot the results
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(8, 8))
         plt.plot(x, majority_y, '-o', label="Majority Voting", color="blue")
         plt.plot(x, best_of_n_y, '-o', label="Best-of-N", color="orange")
-        plt.plot(x, weighted_best_of_n_y, '-o', label="Weighted Majority Voting", color="green")
+        plt.plot(x, weighted_majority_voting_y, '-o', label="Weighted Majority Voting", color="green")
         plt.xscale("log", base=2)
         # plt.xticks(x, labels=[f"$2^{{{int(np.log2(n))}}}$" for n in x])
         plt.xticks(x, labels=[f"{n}" for n in x])
         plt.xlabel("Number of sampled CoT solutions (log scale)")
+        # plt.ylim(40, 80)
         plt.ylabel("Accuracy (%)")
         plt.title(f"Comparison of Voting Methods ({method.capitalize()} RM Reward Aggregation)")
         plt.legend()
@@ -473,7 +474,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--results_dir", type=str, default="strawberry1/full_precision_results")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
-    parser.add_argument("--model", type=str, default="deepseek_8b_prm")
+    parser.add_argument("--model", type=str, default="prm800k_llama_fulltune")
     parser.add_argument("--ignore", type=str, default='mmlu_overlap.json')
     args = parser.parse_args()
 
@@ -542,6 +543,10 @@ if __name__ == "__main__":
                 data_by_category[obj['metadata']['category']].append(obj)
                         
 
+        acc_values = {'best-of-128 (min)': {},
+                      'weighted majority voting (min)': {},
+                      'majority voting (128)': {}}
+
         pass
         # data_by_category['all'] = data
 
@@ -549,12 +554,21 @@ if __name__ == "__main__":
 
             majority_voting_metrics = calculate_majority_voting_metrics_with_sampling(data_by_category[category], category, file_path)
             best_of_n_metrics = calculate_best_of_n_metrics(data_by_category[category], category, file_path)
-            weighted_best_of_n_metrics = calculate_weighted_best_of_n_metrics(data_by_category[category], category, file_path)
+            weighted_majority_voting_metrics = calculate_weighted_majority_voting_metrics(data_by_category[category], category, file_path)
+
+
+            acc_values['majority voting (128)'][category] = majority_voting_metrics[128]['mean']
+            acc_values['best-of-128 (min)'][category] = best_of_n_metrics['min'][128]['mean']
+            acc_values['weighted majority voting (min)'][category] = weighted_majority_voting_metrics['min'][128]['mean']
+
 
             compare_results(file_basename = os.path.join(os.path.basename(file_path).split(".js")[0], category),
                             majority_voting_folder="majority_voting_metrics",
                             best_of_n_folder="best_of_n_metrics",
-                            weighted_best_of_n_folder="weighted_best_of_n_metrics"
+                            weighted_majority_voting_folder="weighted_majority_voting_metrics"
                             )
             
-            print("category {} done.".format(category))
+            print("model {} category {} done.".format(args.model, category))
+
+        with open(os.path.join('results_by_category', '{}_mean_acc_values.json'.format(args.model)), 'w', encoding='utf-8') as file:
+            json.dump(acc_values, file, indent=4)
