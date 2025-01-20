@@ -65,8 +65,10 @@ declare -A CONFIGS=(
 # MODELS=("prm800k_qwen_alt_lora" "prm800k_llama_joint_checkpoint4500")
 # MODELS=("prm800k_llama_lora")
 # MODELS=("prm800k_llama_fulltune")
-MODELS=("prm800k_qwen_alt_lora" "prm800k_llama_lora")
-# MODELS=("rlhflow-ds_qwen_fulltune")
+# MODELS=("prm800k_qwen_alt_lora" "prm800k_llama_lora")
+# MODELS=("sciqqa_noaugs_masked_qwen_lora")
+# MODELS=("v7_noaugs_qwen_lora")
+MODELS=("mmlu_augs_llama_lora")
 # Loop over each dataset configuration
 for DATASET in "${!CONFIGS[@]}"; do
   # Split the configuration value into output directory and metric file directory
@@ -77,6 +79,7 @@ for DATASET in "${!CONFIGS[@]}"; do
     echo "Processing dataset: $DATASET with model: $MODEL"
     
     # Run the Python script with current dataset, model, and output configuration
+    CUDA_VISIBLE_DEVICES=0 \
     python ./search/get_rewards_reasoning_step.py \
       --example_file_path_dir "$DATASET" \
       --test_prm "$MODEL" \

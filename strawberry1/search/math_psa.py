@@ -45,7 +45,7 @@ class math_psa_prm(PRM):
                 self.model_path,
                 torch_dtype=torch.bfloat16).to(self.device)
         
-        self.adapter_path = "/home/ec2-user/Math-psa/checkpoint-2127"
+        self.adapter_path = "/mnt/data/huggingface/models/Math-psa/checkpoint-2127"
 
         # self.adapter_config = PeftConfig.from_pretrained(self.adapter_path)
 

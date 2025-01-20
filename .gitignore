@@ -9,3 +9,4 @@ generated_outputs/
 # weighted_best_of_n_metrics/**/*
 **/__pycache__/
 reset.sh
+results_old/**/*
