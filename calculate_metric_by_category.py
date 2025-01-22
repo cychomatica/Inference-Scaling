@@ -474,7 +474,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--results_dir", type=str, default="strawberry1/full_precision_results")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
-    parser.add_argument("--model", type=str, default="prm800k_llama_fulltune")
+    parser.add_argument("--model", type=str, default="mmlu_small_noaugs_llama_lora")
     parser.add_argument("--ignore", type=str, default='mmlu_overlap.json')
     args = parser.parse_args()
 

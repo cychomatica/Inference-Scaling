@@ -5,8 +5,8 @@
 declare -A CONFIGS=(
   ["./transformed_mmlupro"]="./full_precision_results/transformed_mmlupro_reward_results ./full_precision_figures"
 )
-MODEL=("mmlu_augs_llama_lora")
-BATCH_ID=0
+MODELS=("mmlu_small_noaugs_llama_lora")
+BATCH_ID=3
 BATCH_NUM=4
 
 # Loop over each dataset configuration
