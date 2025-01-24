@@ -29,8 +29,7 @@ class Qwen7bPRM(PRM):
         aggregation: str = "full",#the way how prm step scores will be aggregated in a solution
         quantization_config: Optional[BitsAndBytesConfig] = None,
         device: Optional[Device] = None,
-        model_path='/home/ec2-user/Skywork-o1-Open-PRM-Qwen-2.5-7B') -> None:
-
+        model_path='/mnt/data/huggingface/models/models--Skywork--Skywork-o1-Open-PRM-Qwen-2.5-7B/snapshots/d28ac22e10adb604a66ecfb1a00a1f527d5d8c84') -> None:
         self.device = (
             device if device else ("cuda" if torch.cuda.is_available() else "cpu")
         )

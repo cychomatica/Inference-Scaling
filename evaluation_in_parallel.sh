@@ -7,7 +7,7 @@
 declare -A CONFIGS=(
   ["./eval_data/transformed_mmlupro"]="/mnt/data/full_precision_results/transformed_mmlupro_reward_results /mnt/data/full_precision_figures"
 )
-MODELS=(" " "qwen2.5_math_7b_prm800k" "math_shepherd" "rlhflow_deepseek")
+MODELS=("mmlu_noaugs_llamabase_lora" "mmlu_noaugs_qwen_lora")
 BATCH_NUM=4
 
 for DATASET in "${!CONFIGS[@]}"; do

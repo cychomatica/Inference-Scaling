@@ -84,22 +84,32 @@ def compare_results(file_basename, results_dir, majority_voting_folder, best_of_
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", type=str, default="results_by_category")
+    parser.add_argument("--results_dir", type=str, default="/mnt/data/results_by_category")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
-    parser.add_argument("--models", type=list, nargs="*", default=["mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora"])
+    parser.add_argument("--models", type=list, nargs="*", default=['all'])
     parser.add_argument("--ignore", type=str, default='mmlu_overlap.json')
     args = parser.parse_args()
 
 
     models_to_eval = {}
-    for model in args.models:
-        models_to_eval[model] = {}
+    if 'all' in args.models:
+        folder_name_list = sorted(os.listdir(os.path.join(args.results_dir, 'comparison')))
+        for folder_name in folder_name_list:
+            model = folder_name.replace('cot_with_', '').replace('_rewards', '')
+            if model.startswith('sciqqa') or model.startswith('v'):
+                continue
+            models_to_eval[model] = {}
+        pass
+    else:
+        for model in args.models:
+            models_to_eval[model] = {}
 
-    categories = ["all", "health", "computer science", "economics", "chemistry", "business", "other", "physics", "law", "engineering", "history", "psychology", "math", "philosophy", "biology"]
+    categories = ["all", "all_except_math", "health", "computer science", "economics", "chemistry", "business", "other", "physics", "law", "engineering", "history", "psychology", "math", "philosophy", "biology"]
 
+    fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
     for category in categories:
 
-        fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
+        # fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
 
         for model in models_to_eval:
 
@@ -125,7 +135,9 @@ if __name__ == "__main__":
             # models_to_eval[model][category]['min_value'] = min(flatten)
             # fig_y_max.append(models_to_eval[model][category]['max_value'])
             # fig_y_min.append(models_to_eval[model][category]['min_value'])
-        
+            
+    for category in categories:
+
         for method in ['last', 'mean', 'min']:
             
             weighted_majority_voting_y_list = {}
@@ -137,10 +149,12 @@ if __name__ == "__main__":
             max_value = max(fig_y_max[method]) // 2 * 2 + 2
 
             # Plot the results
-            plt.figure(figsize=(10, 10))
+            plt.figure(figsize=(16, 16))
             plt.plot(x, majority_y, '-o', label="Majority Voting", color="blue")
-            plt.plot(x, weighted_majority_voting_y_list['mmlu_math_noaugs_llama_lora'], '-o', label="PRM finetuned on MMLU math subset Weighted Majority Voting")
-            plt.plot(x, weighted_majority_voting_y_list['mmlu_small_noaugs_llama_lora'], '-o', label="PRM finetuned on MMLU uniformly random subset Weighted Majority Voting")
+            for model in models_to_eval:
+                plt.plot(x, weighted_majority_voting_y_list[model], '-o', label="{} Weighted Majority Voting".format(model))
+            # plt.plot(x, weighted_majority_voting_y_list['mmlu_math_noaugs_llama_lora'], '-o', label="PRM finetuned on MMLU math subset Weighted Majority Voting")
+            # plt.plot(x, weighted_majority_voting_y_list['mmlu_small_noaugs_llama_lora'], '-o', label="PRM finetuned on MMLU uniformly random subset Weighted Majority Voting")
             plt.xscale("log", base=2)
             plt.xticks(x, labels=[f"{n}" for n in x])
             plt.xlabel("Number of sampled CoT solutions (log scale)")

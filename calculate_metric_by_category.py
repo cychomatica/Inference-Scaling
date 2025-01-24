@@ -557,5 +557,6 @@ if __name__ == "__main__":
             
             print("model {} category {} done.".format(args.model, category))
 
-        with open(os.path.join(args.save_dir, '{}_mean_acc_values.json'.format(args.model)), 'w', encoding='utf-8') as file:
+        os.makedirs(os.path.join(args.save_dir, 'mean_acc_values'), exist_ok=True)
+        with open(os.path.join(args.save_dir, 'mean_acc_values', '{}_mean_acc_values.json'.format(args.model)), 'w', encoding='utf-8') as file:
             json.dump(acc_values, file, indent=4)

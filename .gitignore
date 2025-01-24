@@ -3,9 +3,10 @@ full_precision_figures/
 data_link
 eval_data/
 figures_new/
+new_figures/
 results_by_category/**/*
-figures_new/
 _trash/
+_history/
 **/__pycache__/
 **/.vscode
 reset.sh

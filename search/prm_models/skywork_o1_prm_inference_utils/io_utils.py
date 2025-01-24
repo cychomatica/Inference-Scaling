@@ -22,22 +22,22 @@ def prepare_input(problem, response, tokenizer, step_token):
     input_ids = prompt_ids + response_ids
     return input_ids, steps, reward_flags
 
-def prepare_batch_input_for_model(input_ids,reward_flags, pad_token_id):
+def prepare_batch_input_for_model(input_ids,reward_flags, pad_token_id, device):
     padded_input_ids = torch.nn.utils.rnn.pad_sequence(
         [torch.LongTensor(ids) for ids in input_ids], 
         batch_first=True,
         padding_value=pad_token_id
-    )
+    ).to(device)
     padded_attention_mask = torch.nn.utils.rnn.pad_sequence(
         [torch.LongTensor([1] * len(ids)) for ids in input_ids], 
         batch_first=True,
         padding_value=0
-    )
+    ).to(device)
     padded_reward_flags = torch.nn.utils.rnn.pad_sequence(
         [torch.LongTensor(reward_flag) for reward_flag in reward_flags], 
         batch_first=True,
         padding_value=0
-    )
+    ).to(device)
     return padded_input_ids, padded_attention_mask,padded_reward_flags
 
 def derive_step_rewards(rewards, reward_flags):

@@ -385,7 +385,7 @@ def main():
 
     # Add argument for the directory paths and test_prm
     parser.add_argument('--example_file_path_dir', type=str, required=True, help="Directory for example files")
-    parser.add_argument('--test_prm', type=str, choices=['llemma', 'math_shepherd', "gpt4o_real", "reasoneval_7b", "math_psa", "skywork_o1_open_prm_qwen2.5_7b", "rlhflow_8b_prm", "rlhflow_deepseek", "prm800k_qwen_alt_lora", "prm800k_llama_lora", "prm800k_llama_fulltune", "prm800k_qwen_fulltune", "rlhflow-ds_qwen_fulltune", "v4_llama_lora", "v4_qwen_lora", "sciqqa_noaugs_qwen_lora", "sciqqa_noaugs_llama_lora", "v5_qwen_lora", "v5_llama_lora", "v6_llama_lora", "sciqqa_noaugs_masked_qwen_lora", "v7_noaugs_qwen_lora", "sciqqa_augs_llama_lora", "mmlu_noaugs_llama_lora", "v7_noaugs_llama_lora", "mmlu_onlyaugs_llama_lora", "v7_onlyaugs_llama_lora", "sciqqa_onlyaugs_llama_lora", "mmlu_augs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora", "mmlu_heo_augs_llama_lora", "qwen2.5_math_7b_prm800k"], required=True, help="PRM model to use")
+    parser.add_argument('--test_prm', type=str, choices=['llemma', 'math_shepherd', "gpt4o_real", "reasoneval_7b", "math_psa", "skywork_o1_open_prm_qwen2.5_7b", "rlhflow_8b_prm", "rlhflow_deepseek", "prm800k_qwen_alt_lora", "prm800k_llama_lora", "prm800k_llama_fulltune", "prm800k_qwen_fulltune", "rlhflow-ds_qwen_fulltune", "v4_llama_lora", "v4_qwen_lora", "sciqqa_noaugs_qwen_lora", "sciqqa_noaugs_llama_lora", "v5_qwen_lora", "v5_llama_lora", "v6_llama_lora", "sciqqa_noaugs_masked_qwen_lora", "v7_noaugs_qwen_lora", "sciqqa_augs_llama_lora", "mmlu_noaugs_llama_lora", "v7_noaugs_llama_lora", "mmlu_onlyaugs_llama_lora", "v7_onlyaugs_llama_lora", "sciqqa_onlyaugs_llama_lora", "mmlu_augs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora", "mmlu_heo_augs_llama_lora", "qwen2.5_math_7b_prm800k", "mmlu_noaugs_llamabase_lora", "mmlu_noaugs_qwen_lora"], required=True, help="PRM model to use")
     parser.add_argument('--output_dir', type=str, required=True, help="Directory to save the reward files")
     parser.add_argument("--metric_file_dir", type=str, required=True)
     parser.add_argument("--four_bit", action="store_true")
@@ -498,13 +498,13 @@ def main():
                 aggregation="full",
                 model_id="Qwen/Qwen2.5-Math-7B-PRM800K"
             )
-        elif test_prm in ["prm800k_qwen_fulltune", "rlhflow-ds_qwen_fulltune", "v4_qwen_lora", "v5_qwen_lora", "sciqqa_noaugs_qwen_lora", "sciqqa_noaugs_masked_qwen_lora", "v7_noaugs_qwen_lora"]:
+        elif test_prm in ["prm800k_qwen_fulltune", "rlhflow-ds_qwen_fulltune", "v4_qwen_lora", "v5_qwen_lora", "sciqqa_noaugs_qwen_lora", "sciqqa_noaugs_masked_qwen_lora", "v7_noaugs_qwen_lora", "mmlu_noaugs_qwen_lora"]:
             from prm_models.prm_qwen import test_prm_dual
             prm = test_prm_dual(
                 aggregation="full", 
                 model_id="Daewon0808/{}".format(test_prm)
             )
-        elif test_prm in ["prm800k_llama_fulltune", "sciqqa_noaugs_llama_lora", "v4_llama_lora", "v5_llama_lora", "v6_llama_lora", "sciqqa_augs_llama_lora", "mmlu_noaugs_llama_lora", "v7_noaugs_llama_lora", "mmlu_onlyaugs_llama_lora", "v7_onlyaugs_llama_lora", "sciqqa_onlyaugs_llama_lora", "mmlu_augs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora", "mmlu_heo_augs_llama_lora"]:
+        elif test_prm in ["prm800k_llama_fulltune", "sciqqa_noaugs_llama_lora", "v4_llama_lora", "v5_llama_lora", "v6_llama_lora", "sciqqa_augs_llama_lora", "mmlu_noaugs_llama_lora", "v7_noaugs_llama_lora", "mmlu_onlyaugs_llama_lora", "v7_onlyaugs_llama_lora", "sciqqa_onlyaugs_llama_lora", "mmlu_augs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora", "mmlu_heo_augs_llama_lora", "mmlu_noaugs_llamabase_lora"]:
             from prm_models.prm_llama import test_prm_dual
             prm = test_prm_dual(
                 aggregation="full", 
@@ -637,7 +637,7 @@ def main():
                     rewards = prm([steps_all])
                     cot["prm_reward"] = rewards[0].score
 
-                elif test_prm in ["prm800k_qwen_alt_lora", "prm800k_llama_lora", "prm800k_llama_fulltune", "prm800k_qwen_fulltune", "rlhflow-ds_qwen_fulltune", "v4_llama_lora", "v4_qwen_lora", "sciqqa_noaugs_qwen_lora", "sciqqa_noaugs_llama_lora", "v5_qwen_lora", "v5_llama_lora", "v6_llama_lora", "sciqqa_noaugs_masked_qwen_lora", "v7_noaugs_qwen_lora", "sciqqa_augs_llama_lora", "mmlu_noaugs_llama_lora", "v7_noaugs_llama_lora", "mmlu_onlyaugs_llama_lora", "v7_onlyaugs_llama_lora", "sciqqa_onlyaugs_llama_lora", "mmlu_augs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora", "mmlu_heo_augs_llama_lora"]:
+                elif test_prm in ["prm800k_qwen_alt_lora", "prm800k_llama_lora", "prm800k_llama_fulltune", "prm800k_qwen_fulltune", "rlhflow-ds_qwen_fulltune", "v4_llama_lora", "v4_qwen_lora", "sciqqa_noaugs_qwen_lora", "sciqqa_noaugs_llama_lora", "v5_qwen_lora", "v5_llama_lora", "v6_llama_lora", "sciqqa_noaugs_masked_qwen_lora", "v7_noaugs_qwen_lora", "sciqqa_augs_llama_lora", "mmlu_noaugs_llama_lora", "v7_noaugs_llama_lora", "mmlu_onlyaugs_llama_lora", "v7_onlyaugs_llama_lora", "sciqqa_onlyaugs_llama_lora", "mmlu_augs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora", "mmlu_heo_augs_llama_lora", "mmlu_noaugs_llamabase_lora", "mmlu_noaugs_qwen_lora"]:
                     # steps = cot["steps"]
                     steps = [step.strip().replace(" \n\n\n\n", "") for step in steps]
                     question = each_data["question"].strip().replace(" \n\n\n\n", "")

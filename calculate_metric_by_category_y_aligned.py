@@ -84,22 +84,32 @@ def compare_results(file_basename, results_dir, majority_voting_folder, best_of_
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", type=str, default="results_by_category")
+    parser.add_argument("--results_dir", type=str, default="/mnt/data/results_by_category")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
-    parser.add_argument("--models", type=list, nargs="*", default=["prm800k_llama_fulltune", "mmlu_noaugs_llama_lora", "mmlu_math_noaugs_llama_lora", "mmlu_small_noaugs_llama_lora"])
+    parser.add_argument("--models", type=list, nargs="*", default=['all'])
     parser.add_argument("--ignore", type=str, default='mmlu_overlap.json')
     args = parser.parse_args()
 
 
     models_to_eval = {}
-    for model in args.models:
-        models_to_eval[model] = {}
+    if 'all' in args.models:
+        folder_name_list = sorted(os.listdir(os.path.join(args.results_dir, 'comparison')))
+        for folder_name in folder_name_list:
+            model = folder_name.replace('cot_with_', '').replace('_rewards', '')
+            if model.startswith('sciqqa') or model.startswith('v'):
+                continue
+            models_to_eval[model] = {}
+        pass
+    else:
+        for model in args.models:
+            models_to_eval[model] = {}
 
-    categories = ["all", "health", "computer science", "economics", "chemistry", "business", "other", "physics", "law", "engineering", "history", "psychology", "math", "philosophy", "biology"]
+    categories = ["all", "all_except_math", "health", "computer science", "economics", "chemistry", "business", "other", "physics", "law", "engineering", "history", "psychology", "math", "philosophy", "biology"]
 
+    fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
     for category in categories:
 
-        fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
+        # fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
 
         for model in models_to_eval:
 
@@ -126,6 +136,8 @@ if __name__ == "__main__":
             # fig_y_max.append(models_to_eval[model][category]['max_value'])
             # fig_y_min.append(models_to_eval[model][category]['min_value'])
         
+    for category in categories:
+
         for method in ['last', 'mean', 'min']:
             
             for model in models_to_eval:
@@ -150,7 +162,8 @@ if __name__ == "__main__":
                 plt.grid(True)
 
                 # Save the plot
-                os.makedirs(os.path.join(model, category), exist_ok=True)
-                plot_file_path = os.path.join(os.path.join(model, category), f"comparison_{method}.png")
+                save_dir = os.path.join('new_figures', model, category)
+                os.makedirs(save_dir, exist_ok=True)
+                plot_file_path = os.path.join(save_dir, f"comparison_{method}.png")
                 plt.savefig(plot_file_path)
                 plt.close()
