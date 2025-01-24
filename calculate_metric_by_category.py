@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 
-def calculate_weighted_majority_voting_metrics(data, category, json_file_path):
+def calculate_weighted_majority_voting_metrics(data, save_dir, category, json_file_path):
     """
     Calculate Weighted Majority Voting metrics by aggregating RM rewards across identical responses.
     Save metrics and plots.
@@ -38,8 +38,8 @@ def calculate_weighted_majority_voting_metrics(data, category, json_file_path):
     # Prepare the output directory
     # script_path = os.path.abspath(__file__)
     # script_dir = os.path.dirname(script_path)
-    results_dir = "results_by_category"
-    output_dir = os.path.join(results_dir, "weighted_majority_voting_metrics", os.path.basename(json_file_path).split(".js")[0], category)
+    # save_dir = "results_by_category"
+    output_dir = os.path.join(save_dir, "weighted_majority_voting_metrics", os.path.basename(json_file_path).split(".js")[0], category)
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize variables for Weighted Majority Voting
@@ -157,7 +157,7 @@ def calculate_weighted_majority_voting_metrics(data, category, json_file_path):
 
     return metrics
 
-def calculate_best_of_n_metrics(data, category, json_file_path):
+def calculate_best_of_n_metrics(data, save_dir, category, json_file_path):
     """
     Calculate Best-of-N metrics for choosing the most plausible answer using RM rewards.
     Use three RM reward aggregation methods: last, mean, and min.
@@ -176,8 +176,8 @@ def calculate_best_of_n_metrics(data, category, json_file_path):
     # Prepare the output directory
     # script_path = os.path.abspath(__file__)
     # script_dir = os.path.dirname(script_path)
-    results_dir = "results_by_category"
-    output_dir = os.path.join(results_dir, "best_of_n_metrics", os.path.basename(json_file_path).split(".js")[0], category)
+    # save_dir = "results_by_category"
+    output_dir = os.path.join(save_dir, "best_of_n_metrics", os.path.basename(json_file_path).split(".js")[0], category)
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize variables for Best-of-N
@@ -279,7 +279,7 @@ def calculate_best_of_n_metrics(data, category, json_file_path):
 
 
 
-def calculate_majority_voting_metrics_with_sampling(data, category, json_file_path):
+def calculate_majority_voting_metrics_with_sampling(data, save_dir, category, json_file_path):
     """
     Calculate metrics for majority voting accuracy by sampling CoT solutions with sizes 2^0 to 2^8.
     For each sampling size, repeat the sampling 5 times with different random seeds.
@@ -297,8 +297,8 @@ def calculate_majority_voting_metrics_with_sampling(data, category, json_file_pa
     # Prepare the output directory
     # script_path = os.path.abspath(__file__)
     # script_dir = os.path.dirname(script_path)
-    results_dir = "results_by_category"
-    output_dir = os.path.join(results_dir, "majority_voting_metrics", os.path.basename(json_file_path).split(".js")[0], category)
+    # save_dir = "results_by_category"
+    output_dir = os.path.join(save_dir, "majority_voting_metrics", os.path.basename(json_file_path).split(".js")[0], category)
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize variables for sampling metrics
@@ -400,7 +400,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def compare_results(file_basename, majority_voting_folder, best_of_n_folder, weighted_majority_voting_folder):
+def compare_results(file_basename, save_dir, majority_voting_folder, best_of_n_folder, weighted_majority_voting_folder):
     """
     Compare the results of Majority Voting, Best-of-N, and Weighted Majority Voting
     and plot them on the same graph for each RM reward aggregation method (last, mean, min).
@@ -413,17 +413,17 @@ def compare_results(file_basename, majority_voting_folder, best_of_n_folder, wei
     # Define the output directory
     # script_path = os.path.abspath(__file__)
     # script_dir = os.path.dirname(script_path)
-    results_dir = "results_by_category"
-    output_dir = os.path.join(results_dir, "comparison", file_basename)
+    # save_dir = "results_by_category"
+    output_dir = os.path.join(save_dir, "comparison", file_basename)
     os.makedirs(output_dir, exist_ok=True)
 
     # Define RM reward aggregation methods
     aggregation_methods = ['last', 'mean', 'min']
 
     # Define file paths for each method
-    majority_voting_path = os.path.join(results_dir, majority_voting_folder, file_basename)
-    best_of_n_path = os.path.join(results_dir, best_of_n_folder, file_basename)
-    weighted_majority_voting_path = os.path.join(results_dir, weighted_majority_voting_folder, file_basename)
+    majority_voting_path = os.path.join(save_dir, majority_voting_folder, file_basename)
+    best_of_n_path = os.path.join(save_dir, best_of_n_folder, file_basename)
+    weighted_majority_voting_path = os.path.join(save_dir, weighted_majority_voting_folder, file_basename)
 
     for method in aggregation_methods:
         # Load metrics for Majority Voting
@@ -472,15 +472,16 @@ def compare_results(file_basename, majority_voting_folder, best_of_n_folder, wei
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", type=str, default="strawberry1/full_precision_results")
+    parser.add_argument("--results_dir", type=str, default="full_precision_results/transformed_mmlupro_reward_results")
+    parser.add_argument("--save_dir", type=str, default="results_by_category")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
     parser.add_argument("--model", type=str, default="mmlu_small_noaugs_llama_lora")
     parser.add_argument("--ignore", type=str, default='mmlu_overlap.json')
     args = parser.parse_args()
 
 
-    file_dir = os.path.join(args.results_dir, "{}_reward_results".format(args.dataset), "{}_with_{}_reward".format(args.dataset, args.model))
-    file_list = [f for f in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, f)) and os.path.join(file_dir, f).endswith(".json")]
+    file_dir = os.path.join(args.results_dir, "{}_with_{}_reward".format(args.dataset, args.model))
+    file_list = [f for f in os.listdir(file_dir) if os.path.isfile(os.path.join(file_dir, f)) and os.path.join(file_dir, f).endswith("rewards.json")]
 
     data_ignore = {}
     if args.ignore != None and os.path.isfile(args.ignore) and args.ignore.endswith('.json'):
@@ -496,29 +497,11 @@ if __name__ == "__main__":
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
 
-        data_by_category = {'all': []}
+        data_by_category = {'all': [], 'all_except_math': []}
 
         idx_abstain = []
 
         for i, obj in enumerate(data):
-
-            # if len(obj['chain_of_thoughts']) >= 128:
-
-            #     data_by_category['all'].append(obj)
-                
-            #     if obj['metadata']['category'] not in data_by_category:
-            #         data_by_category[obj['metadata']['category']] = [obj]
-            #     else:
-            #         data_by_category[obj['metadata']['category']].append(obj)
-            
-            # else:
-            #     for j in range(len(obj['chain_of_thoughts']), 128):
-            #         obj['chain_of_thoughts'].append([{'steps': [''],
-            #                                         'parsed_answer': '',
-            #                                         'parsed_answer_correctness': False,
-            #                                         'cot_id': j,
-            #                                         'prm_reward': [0]
-            #                                         }])
 
             if obj['id'] in data_ignore:
                 continue
@@ -536,12 +519,15 @@ if __name__ == "__main__":
             assert len(obj['chain_of_thoughts']) == 128
 
             data_by_category['all'].append(obj)
-            
+            if obj['metadata']['category'] != 'math':
+                 data_by_category['all_except_math'].append(obj)
+
             if obj['metadata']['category'] not in data_by_category:
                 data_by_category[obj['metadata']['category']] = [obj]
             else:
                 data_by_category[obj['metadata']['category']].append(obj)
                         
+        assert len(data_by_category['all_except_math']) + len(data_by_category['math']) == len(data_by_category['all'])
 
         acc_values = {'best-of-128 (min)': {},
                       'weighted majority voting (min)': {},
@@ -552,9 +538,9 @@ if __name__ == "__main__":
 
         for category in data_by_category:
 
-            majority_voting_metrics = calculate_majority_voting_metrics_with_sampling(data_by_category[category], category, file_path)
-            best_of_n_metrics = calculate_best_of_n_metrics(data_by_category[category], category, file_path)
-            weighted_majority_voting_metrics = calculate_weighted_majority_voting_metrics(data_by_category[category], category, file_path)
+            majority_voting_metrics = calculate_majority_voting_metrics_with_sampling(data_by_category[category], args.save_dir, category, file_path)
+            best_of_n_metrics = calculate_best_of_n_metrics(data_by_category[category], args.save_dir, category, file_path)
+            weighted_majority_voting_metrics = calculate_weighted_majority_voting_metrics(data_by_category[category], args.save_dir, category, file_path)
 
 
             acc_values['majority voting (128)'][category] = majority_voting_metrics[128]['mean']
@@ -563,6 +549,7 @@ if __name__ == "__main__":
 
 
             compare_results(file_basename = os.path.join(os.path.basename(file_path).split(".js")[0], category),
+                            save_dir=args.save_dir, 
                             majority_voting_folder="majority_voting_metrics",
                             best_of_n_folder="best_of_n_metrics",
                             weighted_majority_voting_folder="weighted_majority_voting_metrics"
@@ -570,5 +557,5 @@ if __name__ == "__main__":
             
             print("model {} category {} done.".format(args.model, category))
 
-        with open(os.path.join('results_by_category', '{}_mean_acc_values.json'.format(args.model)), 'w', encoding='utf-8') as file:
+        with open(os.path.join(args.save_dir, '{}_mean_acc_values.json'.format(args.model)), 'w', encoding='utf-8') as file:
             json.dump(acc_values, file, indent=4)

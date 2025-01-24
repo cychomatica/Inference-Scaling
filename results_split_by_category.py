@@ -4,7 +4,7 @@ import argparse, json, os
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", type=str, default="strawberry1/full_precision_results")
+    parser.add_argument("--results_dir", type=str, default="full_precision_results")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
     parser.add_argument("--model", type=str, default="math_psa")
     parser.add_argument("--output_dir", type=str, default="results_by_category")

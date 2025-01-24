@@ -1,12 +1,11 @@
-# comparison/**/*
-# majority_voting_metrics/**/*
-# best_of_n_metrics/**/*
-strawberry1/transformed_llama1b_math500/**/*
-strawberry1/transformed_prm800k_small_test_set/**/*
-strawberry1/transformed_mmlupro/**/*
-strawberry1/full_precision_results/**/*
-generated_outputs/
-# weighted_best_of_n_metrics/**/*
+full_precision_results/
+full_precision_figures/
+data_link
+eval_data/
+figures_new/
+results_by_category/**/*
+figures_new/
+_trash/
 **/__pycache__/
+**/.vscode
 reset.sh
-results_old/**/*
