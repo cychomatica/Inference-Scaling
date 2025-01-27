@@ -1,12 +1,6 @@
-full_precision_results/
-full_precision_figures/
-data_link
-eval_data/
-figures_new/
-new_figures/
 results_by_category/**/*
+results_backup/**/*
 _trash/
 _history/
 **/__pycache__/
 **/.vscode
-reset.sh

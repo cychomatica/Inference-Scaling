@@ -104,10 +104,11 @@ if __name__ == '__main__':
     # fig_y_max, fig_y_min = {'last': [], 'mean': [], 'min': []}, {'last': [], 'mean': [], 'min': []}
     # categories = ['all', 'all_except_math', 'health', 'computer science', 'economics', 'chemistry', 'business', 'other', 'physics', 'law', 'engineering', 'history', 'psychology', 'math', 'philosophy', 'biology']
     categories = {'math': 'Math', 'math_adjacent': 'Math-Adjacent Domains', 'non_math_adjacent': 'Non-Math-Adjacent Domains'}
+    categories = {'math': 'Math', 'all_except_math': 'Non-Math Domains'}
 
     plt.rcParams["font.family"] = "Times New Roman"
-    fig, ax = plt.subplots(3, 1, 
-                           figsize=(8, 12)
+    fig, ax = plt.subplots(1, len(categories),
+                           figsize=(12, 6)
                                 )
     # cmap = plt.get_cmap('viridis', len(models_to_eval))
     # colors = [cmap(i) for i in range(len(models_to_eval))]
@@ -150,45 +151,8 @@ if __name__ == '__main__':
             min_value = min(fig_y_min[method]) // 2 * 2 - 2
             max_value = max(fig_y_max[method]) // 2 * 2 + 2
 
-            # # Plot the results
-            # fig, ax = plt.subplots(figsize=(10, 8))
-            # plt.rcParams["font.family"] = "Times New Roman"
-
-            # ax.plot(x, majority_y, '-o', label='Majority Voting', color='blue')
-            # # for model in models_to_eval:
-            # #     ax.plot(x, weighted_majority_voting_y_list[model], '-o', label='{}'.format(MODEL_NAMES[model]))
-            # for model in models_to_eval:
-            #     ax.plot(x, best_of_n_y_list[model], '-o', label='{}'.format(MODEL_NAMES[model]))
-
-            # # plt.xscale('log', base=2)
-            # # plt.xticks(x, labels=[f'{n}' for n in x])
-            # # plt.xlabel('Number of sampled CoT solutions (log scale)')
-            # # plt.ylim(min_value, max_value)
-            # # plt.ylabel('Accuracy (%)')
-            # # plt.title(f'Comparison of Voting Methods ({method.capitalize()} RM Reward Aggregation)')
-            # # plt.legend(loc='lower right')
-            # # plt.grid(True)
-
-            # ax.set_xscale('log', base=2)
-            # ax.set_ylim(min_value, max_value)
-            # ax.tick_params(axis='x', rotation=0, labelsize=X_AXIS_LABEL_FONT_SIZE)
-            # ax.tick_params(axis='y', labelsize=Y_AXIS_NUMBER_FONT_SIZE)
-            # ax.set_xticks(ticks=x, labels=[f'{n}' for n in x], fontsize=X_AXIS_NUMBER_FONT_SIZE)
-            # ax.set_xlabel('Number of sampled CoT solutions (log scale)', fontsize=Y_AXIS_LABEL_FONT_SIZE)
-            # ax.set_ylabel('Inference Accuracy (%)', fontsize=Y_AXIS_LABEL_FONT_SIZE)
-            # ax.grid(True)
-            # ax.legend(loc='lower right', fontsize=LEGEND_FONT_SIZE)
-            # plt.tight_layout()
-
-            # # Save the plot
-            # os.makedirs(os.path.join(args.save_dir, category), exist_ok=True)
-            # plot_file_path = os.path.join(os.path.join(args.save_dir, category), f'{category}_bon_{method}_agg.pdf')
-            # plt.savefig(plot_file_path)
-            # plt.close()
-
-            
             for m, model in enumerate(models_to_eval):
-                line, = ax[c].plot(x, weighted_majority_voting_y_list[model], '-o', markersize=MARKER_SIZE, label='{} WMV'.format(MODEL_NAMES[model]), color=colors[m])
+                line, = ax[c].plot(x, weighted_majority_voting_y_list[model], '-o', markersize=MARKER_SIZE, label='{} WMV'.format(MODEL_NAMES[model]), color=colors[m+4])
                 lines.append(line)
             line, = ax[c].plot(x, majority_y, '-*', markersize=BASELINE_MARKER_SIZE, label='Majority Voting', color=BASELINE_COLOR)
             lines.append(line)
@@ -204,48 +168,15 @@ if __name__ == '__main__':
             ax[c].grid(True)
 
             
-            # for m, model in enumerate(models_to_eval):
-            #     line, = ax[0, c].plot(x, weighted_majority_voting_y_list[model], '-o', markersize=MARKER_SIZE, label='{} WMV'.format(MODEL_NAMES[model]), color=colors[m])
-            #     lines.append(line)
-            # line, = ax[0, c].plot(x, majority_y, '-*', markersize=BASELINE_MARKER_SIZE, label='Majority Voting', color=BASELINE_COLOR)
-            # lines.append(line)
-
-            # ax[0, c].set_xscale('log', base=2)
-            # ax[0, c].set_ylim(min_value, max_value)
-            # ax[0, c].tick_params(axis='x', rotation=0, labelsize=X_AXIS_LABEL_FONT_SIZE)
-            # ax[0, c].tick_params(axis='y', labelsize=Y_AXIS_NUMBER_FONT_SIZE)
-            # ax[0, c].set_xticks(ticks=x, labels=[f'{n}' for n in x], fontsize=X_AXIS_NUMBER_FONT_SIZE)
-            # ax[0, c].set_xlabel('Number of sampled CoT solutions (log scale)', fontsize=Y_AXIS_LABEL_FONT_SIZE)
-            # ax[0, c].set_ylabel('Inference Accuracy (%)', fontsize=Y_AXIS_LABEL_FONT_SIZE)
-            # ax[0, c].set_title(f'{categories[category]}', fontsize=20)
-            # ax[0, c].grid(True)
-            
-            # for m, model in enumerate(models_to_eval):
-            #     line, = ax[1, c].plot(x, best_of_n_y_list[model], '-s', markersize=MARKER_SIZE, label='{} BoN'.format(MODEL_NAMES[model]))
-            #     lines.append(line)
-            # line, = ax[1, c].plot(x, majority_y, '-*', markersize=BASELINE_MARKER_SIZE, label='Majority Voting', color=BASELINE_COLOR)
-            # lines.append(line)
-
-            # ax[1, c].set_xscale('log', base=2)
-            # ax[1, c].set_ylim(min_value, max_value)
-            # ax[1, c].tick_params(axis='x', rotation=0, labelsize=X_AXIS_LABEL_FONT_SIZE)
-            # ax[1, c].tick_params(axis='y', labelsize=Y_AXIS_NUMBER_FONT_SIZE)
-            # ax[1, c].set_xticks(ticks=x, labels=[f'{n}' for n in x], fontsize=X_AXIS_NUMBER_FONT_SIZE)
-            # ax[1, c].set_xlabel('Number of sampled CoT solutions (log scale)', fontsize=Y_AXIS_LABEL_FONT_SIZE)
-            # ax[1, c].set_ylabel('Inference Accuracy (%)', fontsize=Y_AXIS_LABEL_FONT_SIZE)
-            # ax[1, c].grid(True)
-            # ax[1, c].legend(loc='lower right', fontsize=LEGEND_FONT_SIZE)
-
-            
     plt.tight_layout()
 
     custom_lines = [
         Line2D([0], [0], color=BASELINE_COLOR, lw=2, marker='*', markersize=14, linestyle='', label='Majority Voting'),
         Line2D([0], [0], color=BASELINE_COLOR, lw=2, marker='o', markersize=10, linestyle='', label='Weighted Majority Voting'),
-        Line2D([0], [0], color=BASELINE_COLOR, lw=2, marker='s', markersize=10, linestyle='', label='Best of N'),
+        # Line2D([0], [0], color=BASELINE_COLOR, lw=2, marker='s', markersize=10, linestyle='', label='Best of N'),
     ]
     custom_lines2 = [
-        Line2D([0], [0], color=colors[i], lw=6, linestyle='-', label='{} WMV'.format(MODEL_NAMES[model])) for i, model in enumerate(models_to_eval)
+        Line2D([0], [0], color=colors[i+4], lw=6, linestyle='-', label='{} WMV'.format(MODEL_NAMES[model])) for i, model in enumerate(models_to_eval)
     ]
     # custom_lines.extend([
     #     Line2D([0], [0], color=colors[i], lw=6, linestyle='-', label='{} WMV'.format(MODEL_NAMES[model])) for i, model in enumerate(models_to_eval)
@@ -255,25 +186,25 @@ if __name__ == '__main__':
     # ])
 
     fig.legend(handles=custom_lines, 
-           labels=['Majority Voting', 'Weighted Majority Voting', 'Best of N'],
-           loc='lower left', 
-           bbox_to_anchor=(0, 0.05),  # 将图例放在 figure 的下方
+           labels=['Majority Voting', 'Weighted Majority Voting'],
+           loc='lower center', 
+           bbox_to_anchor=(0.5, 0.025),  # 将图例放在 figure 的下方
            ncol=3,
-           fontsize=LEGEND_FONT_SIZE,
+           fontsize=15,
            frameon=False)
     plt.subplots_adjust(
-    bottom=0.15,
+    bottom=0.1,
     )
 
     fig.legend(handles=custom_lines2, 
            labels=[MODEL_NAMES[model] for model in models_to_eval],
-           loc='lower left', 
-           bbox_to_anchor=(0, 0),  # 将图例放在 figure 的下方
+           loc='lower center', 
+           bbox_to_anchor=(0.5, -0.02),  # 将图例放在 figure 的下方
            ncol=3,
-           fontsize=LEGEND_FONT_SIZE,
+           fontsize=15,
            frameon=False)
     plt.subplots_adjust(
-    bottom=0.15,
+    bottom=0.2,
     )
 
     # fig.legend(handles=custom_lines, 

@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 
+
 def calculate_weighted_majority_voting_metrics(data, save_dir, category, json_file_path):
     """
     Calculate Weighted Majority Voting metrics by aggregating RM rewards across identical responses.
@@ -469,6 +470,9 @@ def compare_results(file_basename, save_dir, majority_voting_folder, best_of_n_f
 
     print(f"Comparison plots saved to {output_dir}")
 
+math_adjacent_domains = ['chemistry', 'computer science', 'engineering', 'physics']
+non_math_adjacent_domains = ['biology', 'health', 'psychology', 'business', 'economics', 'law', 'history', 'philosophy', 'other']
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -497,7 +501,7 @@ if __name__ == "__main__":
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
 
-        data_by_category = {'all': [], 'all_except_math': []}
+        data_by_category = {'all': [], 'all_except_math': [], 'math_adjacent': [], 'non_math_adjacent': []}
 
         idx_abstain = []
 
@@ -522,12 +526,19 @@ if __name__ == "__main__":
             if obj['metadata']['category'] != 'math':
                  data_by_category['all_except_math'].append(obj)
 
+            if obj['metadata']['category'] in math_adjacent_domains:
+                data_by_category['math_adjacent'].append(obj)
+
+            if obj['metadata']['category'] in non_math_adjacent_domains:
+                data_by_category['non_math_adjacent'].append(obj)
+
             if obj['metadata']['category'] not in data_by_category:
                 data_by_category[obj['metadata']['category']] = [obj]
             else:
                 data_by_category[obj['metadata']['category']].append(obj)
                         
         assert len(data_by_category['all_except_math']) + len(data_by_category['math']) == len(data_by_category['all'])
+        assert len(data_by_category['math_adjacent']) + len(data_by_category['non_math_adjacent']) == len(data_by_category['all_except_math'])
 
         acc_values = {'best-of-128 (min)': {},
                       'weighted majority voting (min)': {},
@@ -536,7 +547,8 @@ if __name__ == "__main__":
         pass
         # data_by_category['all'] = data
 
-        for category in data_by_category:
+        for category in ['math_adjacent', 'non_math_adjacent']:
+        # for category in data_by_category:
 
             majority_voting_metrics = calculate_majority_voting_metrics_with_sampling(data_by_category[category], args.save_dir, category, file_path)
             best_of_n_metrics = calculate_best_of_n_metrics(data_by_category[category], args.save_dir, category, file_path)
