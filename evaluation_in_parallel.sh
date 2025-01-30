@@ -1,12 +1,10 @@
 #!/bin/bash
 # set -e
 
-# declare -A CONFIGS=(
-#   ["./eval_data/transformed_mmlupro"]="./full_precision_results/transformed_mmlupro_reward_results_test ./full_precision_figures"
-# )
 declare -A CONFIGS=(
-  ["./eval_data/transformed_mmlupro"]="/mnt/data/full_precision_results/transformed_mmlupro_reward_results /mnt/data/full_precision_figures"
+  ["./eval_data/transformed_mmlupro"]="./full_precision_results/transformed_mmlupro_reward_results_test ./full_precision_figures"
 )
+
 MODELS=("mmlu_noaugs_llamabase_lora" "mmlu_noaugs_qwen_lora")
 BATCH_NUM=4
 

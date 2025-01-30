@@ -4,24 +4,12 @@ import random
 from collections import Counter
 import numpy as np
 import matplotlib.pyplot as plt
-
-import json
-import os
-import random
-import numpy as np
-import matplotlib.pyplot as plt
-
-import json
-import os
-import random
-import numpy as np
-import matplotlib.pyplot as plt
-
+import math
 import argparse
 
 
 
-def calculate_weighted_majority_voting_metrics(data, save_dir, category, json_file_path):
+def calculate_weighted_majority_voting_metrics(data, save_dir, category, json_file_path, N_max=128):
     """
     Calculate Weighted Majority Voting metrics by aggregating RM rewards across identical responses.
     Save metrics and plots.
@@ -44,10 +32,10 @@ def calculate_weighted_majority_voting_metrics(data, save_dir, category, json_fi
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize variables for Weighted Majority Voting
-    max_samples = 256  # Maximum CoT solutions per problem
+    max_samples = N_max  # Maximum CoT solutions per problem
     # sample_powers = [2 ** i for i in range(9)]  # 2^0 to 2^8
     # sample_powers = [a for a in sample_powers if a < len(data[0]['chain_of_thoughts'])] + [len(data[0]['chain_of_thoughts'])]
-    sample_powers = [2 ** i for i in range(7)] + [128]
+    sample_powers = [2 ** i for i in range(int(math.log(N_max, 2)) + 1)]
     aggregation_methods = ['last', 'mean', 'min']
     metrics = {method: {} for method in aggregation_methods}  # Store metrics for each method
 
@@ -158,7 +146,7 @@ def calculate_weighted_majority_voting_metrics(data, save_dir, category, json_fi
 
     return metrics
 
-def calculate_best_of_n_metrics(data, save_dir, category, json_file_path):
+def calculate_best_of_n_metrics(data, save_dir, category, json_file_path, N_max=128):
     """
     Calculate Best-of-N metrics for choosing the most plausible answer using RM rewards.
     Use three RM reward aggregation methods: last, mean, and min.
@@ -182,10 +170,10 @@ def calculate_best_of_n_metrics(data, save_dir, category, json_file_path):
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize variables for Best-of-N
-    max_samples = 256  # Maximum CoT solutions per problem
+    max_samples = N_max  # Maximum CoT solutions per problem
     # sample_powers = [2 ** i for i in range(9)]  # 2^0 to 2^8
     # sample_powers = [a for a in sample_powers if a < len(data[0]['chain_of_thoughts'])] + [len(data[0]['chain_of_thoughts'])]
-    sample_powers = [2 ** i for i in range(7)] + [128]
+    sample_powers = [2 ** i for i in range(int(math.log(N_max, 2)) + 1)]
     aggregation_methods = ['last', 'mean', 'min']
     metrics = {method: {} for method in aggregation_methods}  # Store metrics for each method
 
@@ -280,7 +268,7 @@ def calculate_best_of_n_metrics(data, save_dir, category, json_file_path):
 
 
 
-def calculate_majority_voting_metrics_with_sampling(data, save_dir, category, json_file_path):
+def calculate_majority_voting_metrics_with_sampling(data, save_dir, category, json_file_path, N_max=128):
     """
     Calculate metrics for majority voting accuracy by sampling CoT solutions with sizes 2^0 to 2^8.
     For each sampling size, repeat the sampling 5 times with different random seeds.
@@ -303,10 +291,10 @@ def calculate_majority_voting_metrics_with_sampling(data, save_dir, category, js
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize variables for sampling metrics
-    max_samples = 256  # Maximum CoT solutions per problem
+    max_samples = N_max  # Maximum CoT solutions per problem
     # sample_powers = [2 ** i for i in range(9)]  # 2^0 to 2^8
     # sample_powers = [a for a in sample_powers if a < len(data[0]['chain_of_thoughts'])] + [len(data[0]['chain_of_thoughts'])]
-    sample_powers = [2 ** i for i in range(7)] + [128]
+    sample_powers = [2 ** i for i in range(int(math.log(N_max, 2)) + 1)]
     sampling_results = {n: [] for n in sample_powers}
 
     # Outer loop for each sampling size (2^0, 2^1, ..., 2^8)
@@ -476,11 +464,12 @@ non_math_adjacent_domains = ['biology', 'health', 'psychology', 'business', 'eco
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", type=str, default="full_precision_results/transformed_mmlupro_reward_results")
+    parser.add_argument("--results_dir", type=str, default="results_backup/full_precision_results/transformed_mmlupro_reward_results")
     parser.add_argument("--save_dir", type=str, default="results_by_category")
     parser.add_argument("--dataset", type=str, default="transformed_mmlupro")
     parser.add_argument("--model", type=str, default="mmlu_small_noaugs_llama_lora")
     parser.add_argument("--ignore", type=str, default='mmlu_overlap.json')
+    parser.add_argument("--N_max", type=int, default=64)
     args = parser.parse_args()
 
 
@@ -510,9 +499,9 @@ if __name__ == "__main__":
             if obj['id'] in data_ignore:
                 continue
 
-            if len(obj['chain_of_thoughts']) < 128:
+            if len(obj['chain_of_thoughts']) < args.N_max:
 
-                for j in range(len(obj['chain_of_thoughts']), 128):
+                for j in range(len(obj['chain_of_thoughts']), args.N_max):
                     obj['chain_of_thoughts'].append({'steps': [''],
                                                     'parsed_answer': 'NOANSWER_{}'.format(j),
                                                     'parsed_answer_correctness': False,
@@ -520,7 +509,7 @@ if __name__ == "__main__":
                                                     'prm_reward': [0]
                                                       })
                     
-            assert len(obj['chain_of_thoughts']) == 128
+            # assert len(obj['chain_of_thoughts']) == args.N_max
 
             data_by_category['all'].append(obj)
             if obj['metadata']['category'] != 'math':
@@ -547,17 +536,17 @@ if __name__ == "__main__":
         pass
         # data_by_category['all'] = data
 
-        for category in ['math_adjacent', 'non_math_adjacent']:
-        # for category in data_by_category:
+        # for category in ['math_adjacent', 'non_math_adjacent']:
+        for category in data_by_category:
 
-            majority_voting_metrics = calculate_majority_voting_metrics_with_sampling(data_by_category[category], args.save_dir, category, file_path)
-            best_of_n_metrics = calculate_best_of_n_metrics(data_by_category[category], args.save_dir, category, file_path)
-            weighted_majority_voting_metrics = calculate_weighted_majority_voting_metrics(data_by_category[category], args.save_dir, category, file_path)
+            majority_voting_metrics = calculate_majority_voting_metrics_with_sampling(data_by_category[category], args.save_dir, category, file_path, args.N_max)
+            best_of_n_metrics = calculate_best_of_n_metrics(data_by_category[category], args.save_dir, category, file_path, args.N_max)
+            weighted_majority_voting_metrics = calculate_weighted_majority_voting_metrics(data_by_category[category], args.save_dir, category, file_path, args.N_max)
 
 
-            acc_values['majority voting (128)'][category] = majority_voting_metrics[128]['mean']
-            acc_values['best-of-128 (min)'][category] = best_of_n_metrics['min'][128]['mean']
-            acc_values['weighted majority voting (min)'][category] = weighted_majority_voting_metrics['min'][128]['mean']
+            acc_values['majority voting (128)'][category] = majority_voting_metrics[args.N_max]['mean']
+            acc_values['best-of-128 (min)'][category] = best_of_n_metrics['min'][args.N_max]['mean']
+            acc_values['weighted majority voting (min)'][category] = weighted_majority_voting_metrics['min'][args.N_max]['mean']
 
 
             compare_results(file_basename = os.path.join(os.path.basename(file_path).split(".js")[0], category),
