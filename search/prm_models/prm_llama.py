@@ -176,7 +176,6 @@ from transformers import (
 
 import json
 import os
-os.environ["HF_TOKEN"] = "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"
 def read_json_file(file_path):
 
     with open(file_path, 'r') as file:
